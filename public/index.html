@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    rel="stylesheet">
+    <title>Dragon ball Z</title>
+    
+    <script>
+      /* invoca a registraServiceWorker instalar la aplicación en el caché del
+       * navegador. No se espera a que termine el registro. */
+      registraServiceWorker();
+      /** Registra un service worker para instalar la aplicación en el
+       * caché del navegador. La palabra reservada async indica que no espera
+       * a que termine y libera el registro de activación que lo llamó. */
+      async function registraServiceWorker() {
+        if ("serviceWorker" in navigator) {
+          try {
+            /* Registra el service worker y espera que termine. El service
+             * worker debe estar en la carpeta public. La palabra await indica
+             * que espera a que termine y solo puede usarse en una función
+             * async. */
+            const registro = await navigator.serviceWorker.register("sw.js");
+            // Registro correcto y se muestra en la consola.
+            console.log("Service Worker registrado.");
+            console.log(registro);
+          } catch (e) {
+            // Hubo un error en el registro.
+            muestraError(e);
+          }
+        }
+      }
+      /** Procesa una excepción y muestra un mensaje de error.
+       * @param {Error} e descripción del error. */
+      function muestraError(e) {
+        console.log(e);
+        alert(e.message);
+      }
+    </script>
+    <!-- Ícono para la página web. Debe ponerse en la raíz de la página. -->
+    <link rel="icon" sizes="32x32" href="favicon.ico">
+
+    <!-- Color de la barra de navegación de Chrome en dispositivos móviles. -->
+    <meta name="theme-color" content="#ffcb2d">
+
+    <!-- Configuración de la PWA: Chrome y Edge. -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Configuración para Web Clip en Safari. -->
+    <meta name="apple-mobile-web-app-title" content="dmppwa">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="apple-touch-icon" href="img/icono-2048.png">
+    <link rel="apple-touch-icon" sizes="256x256" href="img/icono-256.png">
+    <link rel="apple-touch-icon" sizes="1024x1024" href="img/icono-1024.png">
+    <link rel="apple-touch-icon" sizes="2048x2048" href="img/icono-2048.png">
+
+    <script type="module" src="cmp/mi-footer.js"></script>
+    <link rel="stylesheet" href="css/estilos.css">
+
+    <!-- Carga el núcleo de Firebase. Actualiza los números de versión cuando
+    sea necesario. Hemos quitado el atributo defer que aparecía originalmente.
+    -->
+    <script src="/__/firebase/7.14.6/firebase-app.js"></script>
+    <!-- Solo incluye las características de Firebase que necesites.s -->
+    <script src="/__/firebase/7.14.6/firebase-auth.js"></script>
+    <script src="/__/firebase/7.14.6/firebase-firestore.js"></script>
+    <script src="/__/firebase/7.14.6/firebase-storage.js"></script>
+    <!-- Carga la configuración de tu proyecto en el servidor de Firebase. -->
+    <script src="/__/firebase/init.js"></script>
+  </head>
+  <body>
+    <form action="javascript:guarda()">
+      <h1>Dragon Ball Z </h1>
+     Agrega a tu Personaje favorito con su raza  
+      <p><input id="nombre" type="text" placeholder="Nombre del guerrero " pattern="[a-zA-Zàáâäãåąčćęèé
+        êëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}" required/></p>
+      
+        <p><input id="raza" type="text" placeholder="raza " pattern="[a-zA-Zàáâäãåąčćęèé
+          êëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}" required/></p>
+        
+      
+        <button id="agregar" type="button"
+         onclick="alta();">Agregar</button>
+
+        <button type="submit">Guardar</button>
+        <button id="eliminar" type="button"
+          onclick="elimina();">Eliminar</button>
+        
+      <ul id="lista">
+        <li><progress max="100">LOADING…</progress></li>
+      </ul>
+      
+    </form>
+    <script>
+      /** Id del objeto seleccionado en la lista. */
+      let id = "";
+      const firestore = firebase.firestore();
+      muestraLista();
+      alta();
+      function muestraLista() {
+        /* Pide todos los registros de la colección "PASATIEMPO" ordenados por
+         * el campo "PAS_NOMBRE" de forma ascendente. */
+        firestore.collection("Guerrero").orderBy("NombreGuerrero").onSnapshot(
+          documentos => {
+            let inner = "";
+            documentos.forEach(doc =>
+              inner += /* html */
+              `<li>
+                <button type=button onclick="muestra('${cod(doc.id)}')">
+                  ${cod(doc.data().NombreGuerrero)}
+                  ${cod(doc.data().RazaG)}
+                </button>
+              </li>`);
+            lista.innerHTML = inner;
+          },
+          e => {
+            procesaError(e);
+            muestraLista();
+          }
+        );
+      }
+      /** Prepara la forma para capturar un pasatiempo nuevo. */
+      function alta() {
+        agregar.disabled = true; // Deshabilita el botón "agregar".
+        eliminar.disabled = true; // Deshabilita el botón "eliminar".
+        id = ""; // Pone en blanco el id, porque todavía no agregamos a la BD.
+        nombre.value = ""; // Pone en blanco los datos porque todavía no hay.
+        raza.value = "";
+
+      }
+      /** Prepara la forma para modificar el documento que corresponde al
+       * id seleccionado en el listado.
+       * @param {string} idSel id del documento seleccionado en el listado. */
+      async function muestra(idSel) {
+        try {
+          agregar.disabled = false; // Habilita el botón "agregar".
+          eliminar.disabled = false; // Habilita el botón "eliminar".
+          /* Recupera el documento con el id seleccionado en la colección
+           * "PASATIEMPO". */
+          let doc = await firestore.collection("Guerrero").doc(idSel).get();
+          if (doc.exists) {
+            id = doc.id;
+            let data = doc.data();
+            nombre.value = data.NombreGuerrero || "";
+            raza.value = data.RazaG || "";
+          } else {
+            alert("El pasatiempo selecionado no está registrado.");
+            alta();
+          }
+        } catch (e) {
+          procesaError(e);
+        }
+      }
+      async function guarda() {
+        try {
+          const modelo = {
+            NombreGuerrero: nombre.value.trim(), RazaG: raza.value.trim()
+          };
+          if (id) {
+            /* Modifica el modelo en la base de datos en base al id y espera a
+             * que termine. */
+            await firestore.collection("Guerrero").doc(id).set(modelo);
+          } else {
+            /* Agrega el modelo a la base de datos, genera automáticamente el
+             * id y espera a que termine. */
+            await firestore.collection("Guerrero").add(modelo);
+          }
+          alta();
+        } catch (e) {
+          procesaError(e);
+        }
+      }
+      async function elimina() {
+        try {
+          /* Elimina el documento en la base de datos usando el id y espera a
+           * que termine. */
+          await firestore.collection("Guerrero").doc(id).delete();
+          alta();
+        } catch (e) {
+          procesaError(e);
+        }
+      }
+      function procesaError(e) {
+        console.log(e);
+        alert(e.message);
+      }
+      /** Codifica la información textual para que no inyecte código HTML.
+       * @param {any} valor información a codificar.
+       * @returns {string} el texto transformado. */
+      function cod(valor) {
+        return (valor || "").toString()
+          .replace(/[<>"']/g,
+            /** @param {string} letra */
+            letra => {
+              switch (letra) {
+                case "<": return "&lt;";
+                case ">": return "&gt;";
+                case '"': return "&quot;";
+                case "'": return "&#039;";
+                default: return letra;
+              }
+            });
+      }
+    </script>
+    <output id="mensaje" id="button">
+     
+
+      <progress max="100" id="barra">Cargando Firebase SDK&hellip;</progress>
+    </output>
+  </p>
+  </h2><mi-footer></mi-footer>
+  <script>
+    try {
+      let app = firebase.app();
+      let apis = ["auth", "firestore", "storage"]
+        .filter(api => typeof app[api] === "function");
+      mensaje.value = ``;
+    } catch (e) {
+      muestraError(e);
+    }
+  </script>
+  </body>
+</html>
+
