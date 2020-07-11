@@ -71,15 +71,20 @@
     <script src="/__/firebase/init.js"></script>
   </head>
   <body>
+    <center>
     <form action="javascript:guarda()">
       <h1>Dragon Ball Z </h1>
+      <br>
+
      Agrega a tu Personaje favorito con su raza  
+     <br>
+     <br>
       <p><input id="nombre" type="text" placeholder="Nombre del guerrero " pattern="[a-zA-Zàáâäãåąčćęèé
         êëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}" required/></p>
-      
+      <br>
         <p><input id="raza" type="text" placeholder="raza " pattern="[a-zA-Zàáâäãåąčćęèé
           êëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}" required/></p>
-        
+        <br>
       
         <button id="agregar" type="button"
          onclick="alta();">Agregar</button>
@@ -89,10 +94,14 @@
           onclick="elimina();">Eliminar</button>
         
       <ul id="lista">
+        
         <li><progress max="100">LOADING…</progress></li>
       </ul>
-      
+      <br>
+      <br>
+    </h2><mi-footer></mi-footer>
     </form>
+  </center>
     <script>
       /** Id del objeto seleccionado en la lista. */
       let id = "";
@@ -204,23 +213,9 @@
             });
       }
     </script>
-    <output id="mensaje" id="button">
-     
-
-      <progress max="100" id="barra">Cargando Firebase SDK&hellip;</progress>
-    </output>
+    
   </p>
-  </h2><mi-footer></mi-footer>
-  <script>
-    try {
-      let app = firebase.app();
-      let apis = ["auth", "firestore", "storage"]
-        .filter(api => typeof app[api] === "function");
-      mensaje.value = ``;
-    } catch (e) {
-      muestraError(e);
-    }
-  </script>
+ 
   </body>
 </html>
 
