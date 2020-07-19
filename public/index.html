@@ -71,37 +71,43 @@
     <script src="/__/firebase/init.js"></script>
   </head>
   <body>
-    <center>
-    <form action="javascript:guarda()">
-      <h1>Dragon Ball Z </h1>
-      <br>
-
-     Agrega a tu Personaje favorito con su raza  
-     <br>
-     <br>
-      <p><input id="nombre" type="text" placeholder="Nombre del guerrero " pattern="[a-zA-Zàáâäãåąčćęèé
-        êëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}" required/></p>
-      <br>
-        <p><input id="raza" type="text" placeholder="raza " pattern="[a-zA-Zàáâäãåąčćęèé
-          êëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}" required/></p>
-        <br>
+ 
+    <form class = "formulario" action="javascript:guarda()">
+      <header>
+        
+        <h1>Dragon Ball Z </h1>
+        <button type="submit">
+          <span class="material-icons">
+            save
+          </span>
+        </button>
+        <button type="button" id="eliminar" onclick="elimina();">
+          <span class="material-icons">
+            delete
+          </span>
+        </button>
+      </header>
+      <div class="section">
+        <div class="formularioTo">
       
-        <button id="agregar" type="button"
-         onclick="alta();">Agregar</button>
 
-        <button type="submit">Guardar</button>
-        <button id="eliminar" type="button"
-          onclick="elimina();">Eliminar</button>
-        
-      <ul id="lista">
-        
-        <li><progress max="100">LOADING…</progress></li>
+     <h2 >Agrega a tu Personaje favorito con su raza</h2>  
+       <p class="caja">
+        <input  class="input" id="nombre" type="text" placeholder="Nombre del guerrero " pattern="[a-zA-Zàáâäãåąčćęèé
+          êëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}" required/>
+          <label for=nombre>Nombre </label>
+        </p>
+
+        <p class="caja"></p>
+         <input class="input"id="raza" type="text" placeholder="raza " pattern="[a-zA-Zàáâäãåąčćęèé
+           êëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}" required/>
+             <label for=raza>Raza del Guerrero </label>
+        </p>
+        <ul id="registros">
+        <center><progress max="100">CARGANDO...</progress></center>
       </ul>
-      <br>
-      <br>
-    </h2><mi-footer></mi-footer>
     </form>
-  </center>
+  
     <script>
       /** Id del objeto seleccionado en la lista. */
       let id = "";
@@ -132,7 +138,6 @@
       }
       /** Prepara la forma para capturar un pasatiempo nuevo. */
       function alta() {
-        agregar.disabled = true; // Deshabilita el botón "agregar".
         eliminar.disabled = true; // Deshabilita el botón "eliminar".
         id = ""; // Pone en blanco el id, porque todavía no agregamos a la BD.
         nombre.value = ""; // Pone en blanco los datos porque todavía no hay.
@@ -144,7 +149,7 @@
        * @param {string} idSel id del documento seleccionado en el listado. */
       async function muestra(idSel) {
         try {
-          agregar.disabled = false; // Habilita el botón "agregar".
+         
           eliminar.disabled = false; // Habilita el botón "eliminar".
           /* Recupera el documento con el id seleccionado en la colección
            * "PASATIEMPO". */
@@ -155,7 +160,7 @@
             nombre.value = data.NombreGuerrero || "";
             raza.value = data.RazaG || "";
           } else {
-            alert("El pasatiempo selecionado no está registrado.");
+            alert("La raza no existe.");
             alta();
           }
         } catch (e) {
@@ -214,8 +219,9 @@
       }
     </script>
     
-  </p>
- 
+  </div>
+</div>
+  <mi-footer></mi-footer>
   </body>
 </html>
 
