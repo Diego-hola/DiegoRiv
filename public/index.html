@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta http-equiv="Cache-Control" content="no-cache">
+    <meta http-equiv="Pragma" content="no-cache">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
     rel="stylesheet">
-    <title>Dragon ball Z</title>
-    
+    <title>Dragon Ball Z</title>
     <script>
       /* invoca a registraServiceWorker instalar la aplicación en el caché del
        * navegador. No se espera a que termine el registro. */
@@ -71,11 +72,18 @@
     <script src="/__/firebase/init.js"></script>
   </head>
   <body>
- 
-    <form class = "formulario" action="javascript:guarda()">
+    
+    
+    <form class="formulario" action="javascript:guarda()">
       <header>
         
-        <h1>Dragon Ball Z </h1>
+        <h1 style="color: aliceblue;">Dragon ball Z </h1>
+        <button id="agregar" type="button" id="button"
+                onclick="alta();">
+              <span class="material-icons" id="icon">
+                 plus_one
+              </span>
+        </button>
         <button type="submit">
           <span class="material-icons">
             save
@@ -89,25 +97,26 @@
       </header>
       <div class="section">
         <div class="formularioTo">
+     <h2> Agrega un guerrero con tu raza favorita </h2>
+     
+      <p class="caja">
+        <input class="input" id="nombre" type="text" pattern="[a-zA-Zàáâäãåąčćęèé
+        êëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}" required/>
+        <label for=nombre>nombre del guerrero</label>
+      </p>
+      <br>
+      <h3>  Ahora agrega la raza de tu guerrero </h3>
       
-
-     <h2 >Agrega a tu Personaje favorito con su raza</h2>  
-       <p class="caja">
-        <input  class="input" id="nombre" type="text" placeholder="Nombre del guerrero " pattern="[a-zA-Zàáâäãåąčćęèé
+        <p class="caja">
+          <input class="input" id="raza" type="text" pattern="[a-zA-Zàáâäãåąčćęèé
           êëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}" required/>
-          <label for=nombre>Nombre </label>
+          <label for=raza>raza del guerrero</label>
         </p>
-
-        <p class="caja"></p>
-         <input class="input"id="raza" type="text" placeholder="raza " pattern="[a-zA-Zàáâäãåąčćęèé
-           êëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}" required/>
-             <label for=raza>Raza del Guerrero </label>
-        </p>
-        <ul id="registros">
-        <center><progress max="100">CARGANDO...</progress></center>
-      </ul>
+       <ul id="lista">
+        <center> <progress max="100">LOADING…</progress></center>
+        </ul>
     </form>
-  
+
     <script>
       /** Id del objeto seleccionado en la lista. */
       let id = "";
@@ -117,15 +126,14 @@
       function muestraLista() {
         /* Pide todos los registros de la colección "PASATIEMPO" ordenados por
          * el campo "PAS_NOMBRE" de forma ascendente. */
-        firestore.collection("Guerrero").orderBy("NombreGuerrero").onSnapshot(
+        firestore.collection("GUERREROS").orderBy("nombre").onSnapshot(
           documentos => {
             let inner = "";
             documentos.forEach(doc =>
               inner += /* html */
-              `<li>
-                <button type=button onclick="muestra('${cod(doc.id)}')">
-                  ${cod(doc.data().NombreGuerrero)}
-                  ${cod(doc.data().RazaG)}
+              ` <li>
+                <button class="registros" type=button onclick="muestra('${cod(doc.id)}')">
+                  ${cod(doc.data().nombre)} es un  ${cod(doc.data().raza)}
                 </button>
               </li>`);
             lista.innerHTML = inner;
@@ -149,18 +157,18 @@
        * @param {string} idSel id del documento seleccionado en el listado. */
       async function muestra(idSel) {
         try {
-         
+          
           eliminar.disabled = false; // Habilita el botón "eliminar".
           /* Recupera el documento con el id seleccionado en la colección
            * "PASATIEMPO". */
-          let doc = await firestore.collection("Guerrero").doc(idSel).get();
+          let doc = await firestore.collection("GUERREROS").doc(idSel).get();
           if (doc.exists) {
             id = doc.id;
             let data = doc.data();
-            nombre.value = data.NombreGuerrero || "";
-            raza.value = data.RazaG || "";
+            nombre.value = data.nombre|| "";
+            raza.value = data.raza|| "";
           } else {
-            alert("La raza no existe.");
+            alert("Ese guerrero no existe en el universo .");
             alta();
           }
         } catch (e) {
@@ -170,16 +178,16 @@
       async function guarda() {
         try {
           const modelo = {
-            NombreGuerrero: nombre.value.trim(), RazaG: raza.value.trim()
+            nombre:nombre.value.trim(), raza: raza.value.trim()
           };
           if (id) {
             /* Modifica el modelo en la base de datos en base al id y espera a
              * que termine. */
-            await firestore.collection("Guerrero").doc(id).set(modelo);
+            await firestore.collection("GUERREROS").doc(id).set(modelo);
           } else {
             /* Agrega el modelo a la base de datos, genera automáticamente el
              * id y espera a que termine. */
-            await firestore.collection("Guerrero").add(modelo);
+            await firestore.collection("GUERREROS").add(modelo);
           }
           alta();
         } catch (e) {
@@ -190,7 +198,7 @@
         try {
           /* Elimina el documento en la base de datos usando el id y espera a
            * que termine. */
-          await firestore.collection("Guerrero").doc(id).delete();
+          await firestore.collection("GUERREROS").doc(id).delete();
           alta();
         } catch (e) {
           procesaError(e);
@@ -218,10 +226,9 @@
             });
       }
     </script>
-    
+    </div>
   </div>
-</div>
-  <mi-footer></mi-footer>
+    <mi-footer></mi-footer>
+  
   </body>
 </html>
-
